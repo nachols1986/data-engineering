@@ -142,7 +142,7 @@ user = 'nacho_ls_coderhouse'
 password = 'w7IkMu0Tb8'
 port = 5439
 
-# 3. Insertar todo el contenido del DataFrame df_info en la tabla stations_info
+# Volcamos el contenido de los df sobre Redshift
 engine_prompt = f'postgresql://{user}:{password}@{host}:{port}/{database}'
 engine = create_engine(engine_prompt)
 
