@@ -128,6 +128,7 @@ df_st['last_refresh'] = pd.Timestamp.now()
 # 1. Cantidad de estaciones fuera de servicio por fecha
 df_est_oos = df_st.groupby(['last_refresh','status'])['station_id'].count()
 df_est_oos = df_est_oos.unstack(fill_value=0)
+df_est_oos.reset_index()
 
 # 2. Quiero para cada estación (guardando por fecha) su % de bicicletas disponibles
 df_merge = pd.merge(df_st, df_info, how = 'left', on = 'station_id')
