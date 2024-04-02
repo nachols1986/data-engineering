@@ -13,6 +13,7 @@
 
 La estructura que debería quedar es la siguiente:
 
+```
 /
 ├── ecobici
 ├── dags
@@ -28,7 +29,7 @@ La estructura que debería quedar es la siguiente:
 ├── Dockerfile
 ├── docker-compose.yaml
 └── requirements.txt
-
+````
 
 #### Paso 3: Construcción de la imagen Docker
 
