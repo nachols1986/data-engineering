@@ -14,8 +14,7 @@
 La estructura que debería quedar es la siguiente:
 
 ```
-/
-├── ecobici
+/ ecobici
 ├── dags
 │   ├── src
 │   │   ├── conexion_api.py
