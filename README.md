@@ -9,7 +9,25 @@
 
 1. Copia el archivo Dockerfile, docker-compose.yaml y requirements.txt en la carpeta `C:\ecobici`.
 2. Copia el archivo dag.py y la carpeta `src` (que contiene los scripts `.py` necesarios) en una subcarpeta llamada `dags` dentro de `C:\ecobici`.
-3. Dentro de la carpeta `src`, crea una subcarpeta llamada `env` y coloca dentro los archivos gcba_api_key.env y redshift_key.env.
+3. También dentro de la carpeta `dags`, crea una subcarpeta llamada `env` y coloca dentro los archivos gcba_api_key.env y redshift_key.env.
+
+La estructura que debería quedar es la siguiente:
+
+/
+├── ecobici
+├── dags
+│   ├── src
+│   │   ├── conexion_api.py
+│   │   ├── process_ecobici_data.py
+│   │   ├── create_aggregated_tables.py
+│   │   └── upload_to_redshift.py
+│   ├── env
+│   │   ├── gcba_api_key.env
+│   │   └── redshift_key.env
+│   └── dag.py
+├── Dockerfile
+├── docker-compose.yaml
+└── requirements.txt
 
 #### Paso 3: Construcción de la imagen Docker
 
