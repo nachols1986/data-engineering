@@ -29,6 +29,7 @@ La estructura que debería quedar es la siguiente:
 ├── docker-compose.yaml
 └── requirements.txt
 
+
 #### Paso 3: Construcción de la imagen Docker
 
 1. Abre PowerShell en tu sistema.
