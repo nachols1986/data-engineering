@@ -6,7 +6,7 @@ El proceso comienza con la descarga de datos en tiempo real desde la API, la cua
 
 Una vez obtenidos, los datos pasan por un proceso de transformación en Python, donde se aplican diferentes operaciones para limpiar, estructurar y enriquecer la información. Esto incluye la generación de métricas agregadas relevantes, como la disponibilidad de bicicletas en cada estación y la cantidad de estaciones fuera de servicio en un determinado período de tiempo.
 
-Finalmente, los datos transformados se cargan en una base de datos en Amazon Redshift, que sirve como repositorio centralizado para almacenar grandes volúmenes de datos de forma escalable y eficiente. Esta base de datos permite realizar consultas analíticas complejas y generar visualizaciones que ayuden a comprender mejor el comportamiento del sistema de bicicletas públicas en la ciudad.
+Finalmente, los datos transformados se cargan en una base de datos en Amazon Redshift, que sirve como repositorio centralizado para almacenar grandes volúmenes de datos de forma escalable y eficiente. Esta base de datos permite realizar consultas analíticas complejas y generar visualizaciones que ayuden a comprender mejor el comportamiento del sistema de bicicletas públicas en la ciudad. 
 
 Adicionalmente, se envía por email a los destinatarios que uno quisiera, un informe diario con el % de bicicletas fuera de servicio sobre el activo total. Se define un umbral máximo tolerable para dicho % y, en caso de superarlo, se envía un email de alerta.
 
@@ -14,6 +14,7 @@ Todo el proceso está orquestado mediante Airflow, una plataforma de flujo de tr
 
 En resumen, este proyecto ofrece una solución completa para la extracción, transformación y carga de datos de la API de Transporte del Gobierno de la Ciudad de Buenos Aires en una base de datos en Amazon Redshift, utilizando tecnologías modernas y probadas en la industria para garantizar la eficacia y escalabilidad del pipeline de datos.
 
+---
 ### Instructivo para ejecutar el proceso ETL en Airflow con Docker
 
 #### Paso 1: Preparación de archivos
@@ -44,8 +45,6 @@ La estructura que debería quedar es la siguiente:
 │   │   ├── email_key.env
 │   │   └── redshift_key.env
 │   ├── params
-│   │   ├── destinatarios.txt <span style="color:gray">--> en este archivo, armar la lista de destinatarios para el informe diario y alertas</span>
-│   │   └── umbral.env <span style="color:gray">--> aquí definir el valor (0-100) para el máximo % tolerable de bicicletas fuera de servicio</span>
 │   │   ├── destinatarios.txt --> en este archivo, armar la lista de destinatarios para el informe diario y alertas
 │   │   └── umbral.env --> aquí definir el valor (0-100) para el máximo % tolerable de bicicletas fuera de servicio
 │   ├── data
@@ -78,3 +77,45 @@ La estructura que debería quedar es la siguiente:
 1. Una vez iniciada la sesión en Airflow, verás el DAG `ecobici_dag` en la lista de DAG disponibles.
 2. Activa el DAG haciendo clic en el botón de encendido.
 3. Airflow comenzará automáticamente a ejecutar el DAG según la programación definida en el mismo.
+
+---
+### Tablas de la Base de Datos
+
+#### 1. `stations_info`
+
+Esta tabla almacena información sobre las estaciones de bicicletas.
+
+| station_id | name             | lat             | lon              | address                                          | capacity | last_refresh             |
+|------------|------------------|-----------------|------------------|--------------------------------------------------|----------|--------------------------|
+| 2          | 002 - Retiro I   | -34.59242413    | -58.37470989     | AV. Dr. José María Ramos Mejía 1300            | 40       | 2024-04-02 22:07:39.765015 |
+| 3          | 003 - ADUANA     | -34.61220714255728 | -58.36912906378899 | Av. Paseo Colón 380                          | 28       | 2024-04-02 22:07:39.765015 |
+| 4          | 004 - Plaza Roma | -34.6030082348981 | -58.36885646243477 | Av. Corrientes 100                           | 20       | 2024-04-02 22:07:39.765015 |
+
+#### 2. `stations_status`
+
+Esta tabla registra el estado de las estaciones de bicicletas.
+
+| station_id | num_bikes_available | num_bikes_disabled | num_docks_available | num_docks_disabled | last_reported       | status      | last_refresh             |
+|------------|---------------------|--------------------|---------------------|--------------------|---------------------|-------------|--------------------------|
+| 2          | 4                   | 2                  | 34                  | 0                  | 2024-04-02 16:45:15 | IN_SERVICE  | 2024-04-02 19:47:09.568037 |
+| 3          | 9                   | 1                  | 19                  | 0                  | 2024-04-02 16:45:32 | IN_SERVICE  | 2024-04-02 19:47:09.568037 |
+| 4          | 5                   | 1                  | 14                  | 0                  | 2024-04-02 16:46:33 | IN_SERVICE  | 2024-04-02 19:47:09.568037 |
+
+#### 3. `stations_availability`
+
+Esta tabla muestra la disponibilidad de las estaciones.
+
+| last_refresh            | end_of_life | in_service |
+|-------------------------|-------------|------------|
+| 2024-04-02 19:47:09.568037 | 15          | 352        |
+
+#### 4. `stations_free_bikes`
+
+Esta tabla indica la cantidad de bicicletas libres en las estaciones.
+
+| last_refresh_x          | station_id | perc_libres |
+|-------------------------|------------|-------------|
+| 2024-04-02 19:47:09.568037 | 2          | 0.1         |
+| 2024-04-02 19:47:09.568037 | 3          | 0.3214285714285714 |
+| 2024-04-02 19:47:09.568037 | 4          | 0.25        |
+
