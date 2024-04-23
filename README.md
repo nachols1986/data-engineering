@@ -8,6 +8,8 @@ Una vez obtenidos, los datos pasan por un proceso de transformación en Python, 
 
 Finalmente, los datos transformados se cargan en una base de datos en Amazon Redshift, que sirve como repositorio centralizado para almacenar grandes volúmenes de datos de forma escalable y eficiente. Esta base de datos permite realizar consultas analíticas complejas y generar visualizaciones que ayuden a comprender mejor el comportamiento del sistema de bicicletas públicas en la ciudad.
 
+Adicionalmente, se envía por email a los destinatarios que uno quisiera, un informe diario con el % de bicicletas fuera de servicio sobre el activo total. Se define un umbral máximo tolerable para dicho % y, en caso de superarlo, se envía un email de alerta.
+
 Todo el proceso está orquestado mediante Airflow, una plataforma de flujo de trabajo y programación de tareas que facilita la automatización de los procesos ETL. Airflow permite definir, programar y monitorear fácilmente los diferentes pasos del pipeline, garantizando su ejecución de manera confiable y eficiente.
 
 En resumen, este proyecto ofrece una solución completa para la extracción, transformación y carga de datos de la API de Transporte del Gobierno de la Ciudad de Buenos Aires en una base de datos en Amazon Redshift, utilizando tecnologías modernas y probadas en la industria para garantizar la eficacia y escalabilidad del pipeline de datos.
@@ -35,10 +37,15 @@ La estructura que debería quedar es la siguiente:
 │   │   ├── conexion_api.py
 │   │   ├── process_ecobici_data.py
 │   │   ├── create_aggregated_tables.py
+│   │   ├── send_mails.py
 │   │   └── upload_to_redshift.py
 │   ├── env
 │   │   ├── gcba_api_key.env
+│   │   ├── email_key.env
 │   │   └── redshift_key.env
+│   ├── params
+│   │   ├── destinatarios.txt --> en este archivo, armar la lista de destinatarios para el informe diario y alertas
+│   │   └── umbral.env --> en este archivo, definir el valor (0-100) para el máximo % tolerable de bicicletas fuera de servicio
 │   ├── data
 │   └── dag.py
 ├── Dockerfile
