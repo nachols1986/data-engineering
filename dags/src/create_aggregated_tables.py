@@ -14,6 +14,9 @@ df_est_oos = df_st.groupby(['last_refresh','status'])['station_id'].count()
 df_est_oos = df_est_oos.unstack(fill_value=0)
 df_est_oos.reset_index(inplace=True)
 
+# Calcular el porcentaje de END_OF_LIFE sobre el total (EOL + IS)
+df_est_oos['%_END_OF_LIFE'] = round((df_est_oos['END_OF_LIFE'] / (df_est_oos['END_OF_LIFE'] + df_est_oos['IN_SERVICE'])) * 100, 2)
+
 # 2. Quiero para cada estación (guardando por fecha) su % de bicicletas disponibles
 df_merge = pd.merge(df_st, df_info, how='left', on='station_id')
 df_merge['perc_libres'] = df_merge['num_bikes_available'] / df_merge['capacity']

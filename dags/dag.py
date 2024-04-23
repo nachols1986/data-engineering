@@ -1,58 +1,72 @@
-# dag.py
 from airflow import DAG
-from airflow.operators.bash import BashOperator
+from airflow.operators.python import PythonOperator
+from datetime import timedelta, datetime
 import os
 
 path = os.environ['AIRFLOW_HOME']
 
-from datetime import timedelta, datetime
-
 default_args = {
                 'owner': 'airflow',
-                'email': ['ji.lopez.saez@email.com'],
                 'depends_on_past': False,
                 'email_on_failure': False,
                 'email_on_retry': False,
                 'retries': 1,
                 'retry_delay': timedelta(minutes=5),
-                'start_date': datetime(2024, 4, 1),    # Fecha de inicio del DAG
-                'schedule_interval': '0 */6 * * *',    # Ejecutar cada 6 horas
+                'start_date': datetime(2024, 4, 20),    # Fecha de inicio del DAG
+                'schedule_interval': '0 9 * * *',    # Ejecutar a las 9am
                 }
 
-# Define the DAG, its ID and when should it run.
 dag = DAG(
             dag_id='ecobici_dag',
             description='ETL para procesar datas de Ecobici Bs As',
             default_args=default_args,
-            catchup=True
+            catchup=True,
+            max_active_tasks=32
             )
 
-# Conexión a la API del GCBA
-task1 = BashOperator(
-                    task_id='conexion_api',
-                    bash_command=f'python {path}/dags/src/conexion_api.py',
-                    dag=dag
-                    )
+def conexion_api():
+    os.system(f'python {path}/dags/src/conexion_api.py')
 
-# Preprocesamiento de los datos
-task2 = BashOperator(
-                    task_id='process_ecobici_data',
-                    bash_command=f'python {path}/dags/src/process_ecobici_data.py',
-                    dag=dag
-                    )
+def process_ecobici_data():
+    os.system(f'python {path}/dags/src/process_ecobici_data.py')
 
-# Crea tablas agregadas con kpis
-task3 = BashOperator(
-                    task_id='create_aggregated_tables',
-                    bash_command=f'python {path}/dags/src/create_aggregated_tables.py',
-                    dag=dag
-                    )
+def create_aggregated_tables():
+    os.system(f'python {path}/dags/src/create_aggregated_tables.py')
 
-# Carga los datos en amz redshift
-task4 = BashOperator(
-                    task_id='upload_to_redshift',
-                    bash_command=f'python {path}/dags/src/upload_to_redshift.py',
-                    dag=dag
-                    )
+def upload_to_redshift():
+    os.system(f'python {path}/dags/src/upload_to_redshift.py')
 
-task1 >> task2 >> task3 >> task4
+def send_mails():
+    os.system(f'python {path}/dags/src/send_mails.py')
+
+task1 = PythonOperator(
+    task_id='conexion_api',
+    python_callable=conexion_api,
+    dag=dag
+)
+
+task2 = PythonOperator(
+    task_id='process_ecobici_data',
+    python_callable=process_ecobici_data,
+    dag=dag
+)
+
+task3 = PythonOperator(
+    task_id='create_aggregated_tables',
+    python_callable=create_aggregated_tables,
+    dag=dag
+)
+
+task4 = PythonOperator(
+    task_id='upload_to_redshift',
+    python_callable=upload_to_redshift,
+    dag=dag
+)
+
+task5 = PythonOperator(
+    task_id='send_mails',
+    python_callable=send_mails,
+    dag=dag
+)
+
+task1 >> task2 >> task3 >> [task4, task5]
