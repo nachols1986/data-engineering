@@ -44,8 +44,10 @@ La estructura que debería quedar es la siguiente:
 │   │   ├── email_key.env
 │   │   └── redshift_key.env
 │   ├── params
+│   │   ├── destinatarios.txt <span style="color:gray">--> en este archivo, armar la lista de destinatarios para el informe diario y alertas</span>
+│   │   └── umbral.env <span style="color:gray">--> aquí definir el valor (0-100) para el máximo % tolerable de bicicletas fuera de servicio</span>
 │   │   ├── destinatarios.txt --> en este archivo, armar la lista de destinatarios para el informe diario y alertas
-│   │   └── umbral.env --> en este archivo, definir el valor (0-100) para el máximo % tolerable de bicicletas fuera de servicio
+│   │   └── umbral.env --> aquí definir el valor (0-100) para el máximo % tolerable de bicicletas fuera de servicio
 │   ├── data
 │   └── dag.py
 ├── Dockerfile
